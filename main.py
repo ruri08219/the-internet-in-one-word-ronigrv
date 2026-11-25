@@ -15,19 +15,24 @@ ENTRY = "yapping"
 MAX_CHARS = 30
 
 
+def check_word(word):
+    """Return an error message if word is invalid, else None."""
+    if not word or word != word.strip():
+        return "entry must not be empty or padded with whitespace"
+    if len(word) > MAX_CHARS:
+        return "entry must be at most 30 characters"
+    if any(ch.isspace() for ch in word):
+        return "entry must be a single word"
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in word):
+        return "entry must not contain control characters"
+    return None
+
+
 def main():
     word = ENTRY
-    if not word or word != word.strip():
-        print("entry must not be empty or padded with whitespace", file=sys.stderr)
-        return 1
-    if len(word) > MAX_CHARS:
-        print("entry must be at most 30 characters", file=sys.stderr)
-        return 1
-    if any(ch.isspace() for ch in word):
-        print("entry must be a single word", file=sys.stderr)
-        return 1
-    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in word):
-        print("entry must not contain control characters", file=sys.stderr)
+    error = check_word(word)
+    if error is not None:
+        print(error, file=sys.stderr)
         return 1
     out_dir = "/output"
     os.makedirs(out_dir, exist_ok=True)
